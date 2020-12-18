@@ -15,6 +15,7 @@ def login_and_get_token():
         }
     response = requests.post(SETPORTAL_LOGIN_URL, data = credential)
     tokens = response.json()
+    print(tokens)
     token = tokens['token']
     return token
     
