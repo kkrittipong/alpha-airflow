@@ -16,6 +16,8 @@ services:
         restart: always
         depends_on:
             - postgres
+        environment:
+            - AIRFLOW__CORE__EXECUTOR=LocalExecutor
         logging:
             options:
                 max-size: 10m
