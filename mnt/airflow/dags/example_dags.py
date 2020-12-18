@@ -54,4 +54,4 @@ def tutorial_taskflow_api_etl_v2():
     order_data = extract()
     order_summary = transform(order_data)
     load(order_summary["total_order_value"])
-tutorial_etl_dag = tutorial_taskflow_api_etl()
+tutorial_etl_dag = tutorial_taskflow_api_etl_v2()
