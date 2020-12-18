@@ -9,11 +9,12 @@ default_args = {
 }
 def login_and_get_token():
     SETPORTAL_LOGIN_URL = 'https://api.setportal.set.or.th/download-service/login'
+    headers = {'Content-type': 'application/json'}
     credential = {
         "username": "prem079",
         "password": "@pric0ti0n"
         }
-    response = requests.post(SETPORTAL_LOGIN_URL, data = credential)
+    response = requests.post(SETPORTAL_LOGIN_URL, data = credential, headers=headers)
     tokens = response.json()
     print(tokens)
     token = tokens['token']
