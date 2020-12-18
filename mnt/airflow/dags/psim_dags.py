@@ -40,7 +40,7 @@ def psim_etl():
         print(f'token is {token}')
         return token
     
-    # token = extract_psims_all()
-    order_summary = transform(order_data)
-    load(order_summary["total_order_value"])
+    token = extract_psims_all()
+    # order_summary = transform(order_data)
+    # load(order_summary["total_order_value"])
 psim_etl_dag = psim_etl()
