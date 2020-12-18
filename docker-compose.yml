@@ -12,7 +12,7 @@ services:
                 max-file: "3"
 
     webserver:
-        image: ./docker/airflow
+        build: ./docker/airflow
         restart: always
         depends_on:
             - postgres
