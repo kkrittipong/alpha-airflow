@@ -50,7 +50,8 @@ def psim_etl():
         )
 
         response = requests.get('https://api.setportal.set.or.th/download-service/download', headers=headers, params=params, stream=True)
-        print(f'response header is {response.headers}')
+        filename = response.headers['Content-Disposition'].split('=')[1]
+        print(f'filename is {filename}')
         return token
     
     token = extract_psims_all()
