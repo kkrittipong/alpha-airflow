@@ -16,7 +16,6 @@ def login_and_get_token():
         }
     response = requests.post(SETPORTAL_LOGIN_URL, data = json.dumps(credential), headers=headers)
     tokens = response.json()
-    print(tokens)
     token = tokens['token']
     return token
     
@@ -39,7 +38,19 @@ def psim_etl():
         Download PSIMS data with all group and return 
         """
         token = login_and_get_token()
-        print(f'token is {token}')
+        headers = {
+            'accept': '*/*',
+            'Authorization': f'Bearer {token}',
+        }
+
+        params = (
+            ('date', '17/11/2020'),
+            ('file', 'all'),
+            ('group', 'PSIMS'),
+        )
+
+        response = requests.get('https://api.setportal.set.or.th/download-service/download', headers=headers, params=params, stream=True)
+        print(f'response header is {response.headers}')
         return token
     
     token = extract_psims_all()
