@@ -4,6 +4,7 @@ import os
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.python import PythonOperator
+from airflow.operators.python import task, get_current_context
 import io 
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
 
@@ -36,22 +37,15 @@ def psim_etl():
     located
     [here](https://airflow.apache.org/docs/stable/tutorial_taskflow_api.html)
     """
-    def print_context(ds, **kwargs):
-        """Print the Airflow context and ds variable from the context."""
-        pprint(kwargs)
-        print(ds)
-        return ds
-
-    runthis = PythonOperator(
-        task_id='get_ds',
-        python_callable=print_context,
-    )
+    
     @task()
     def extract_psims_all():
         """
         #### EXTRACT_PSIMS_ALL
         Download PSIMS data with all group and return 
         """
+        context = get_current_context()
+        
         token = login_and_get_token()
         headers = {
             'accept': '*/*',
@@ -82,7 +76,7 @@ def psim_etl():
             print(f'no data for {date_string}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
-        print(f'execution date ={runthis.output}')
+        print(f'execution date ={context}')
         return token
     
     token = extract_psims_all()
