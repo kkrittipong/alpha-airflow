@@ -35,8 +35,18 @@ def psim_etl():
     located
     [here](https://airflow.apache.org/docs/stable/tutorial_taskflow_api.html)
     """
+    def print_context(ds, **kwargs):
+        """Print the Airflow context and ds variable from the context."""
+        pprint(kwargs)
+        print(ds)
+        return ds
+
+    runthis = PythonOperator(
+        task_id='get_ds',
+        python_callable=print_context,
+    )
     @task()
-    def extract_psims_all(execution_date={{ ds }}):
+    def extract_psims_all():
         """
         #### EXTRACT_PSIMS_ALL
         Download PSIMS data with all group and return 
@@ -71,7 +81,7 @@ def psim_etl():
             print(f'no data for {date_string}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
-        print(f'execution date ={execution_date}')
+        print(f'execution date ={runthis}')
         return token
     
     token = extract_psims_all()
