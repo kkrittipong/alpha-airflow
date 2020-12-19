@@ -77,7 +77,7 @@ def extract_psim(token, group, file):
     
     if response.status_code == 200:
         filename = response.headers['Content-Disposition'].split('=')[1]
-        azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{filename}'
+        azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{group}/{filename}'
         container_name = 'set'
         upload_to_azure(container_name=container_name, file_name=azure_file_name, content=response.content)
 
@@ -94,7 +94,7 @@ def extract_psim_loopnum(token, group, file):
         response = download_set(token, prev_date.strftime('%d/%m/%Y'), file=file, group=group, no=f'{file_count:02}')
         if response.status_code == 200:
             filename = response.headers['Content-Disposition'].split('=')[1]
-            azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{filename}'
+            azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{group}/{filename}'
             container_name = 'set'
             upload_to_azure(container_name=container_name, file_name=azure_file_name, content=response.content)
             file_count = file_count + 1
