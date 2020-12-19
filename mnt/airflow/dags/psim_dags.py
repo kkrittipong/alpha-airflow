@@ -48,6 +48,9 @@ def download_set(token, date, file, group):
     return response
 
 def upload_to_azure(container_name, file_name, content):
+    """
+    content is response.content from requests
+    """
     connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
     blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
@@ -93,8 +96,33 @@ def set_psim_etl():
             raise ValueError(f'Failed to download; response code is{response.status_code}')
         # print(f'execution date ={context['ds']}')
         return 1
+
+    @task()
+    def extract_psims_public():
+        """
+        #### EXTRACT_PSIMS_ALL
+        Download PSIMS data with all group and return 
+        """
+        context = get_current_context()
+        prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
+        token = login_and_get_token()
+        response = download_set(token, prev_date.strftime('%d/%m/%Y'), file='public', group='PSIMS')
+        
+        if response.status_code == 200:
+            filename = response.headers['Content-Disposition'].split('=')[1]
+            azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{filename}'
+            container_name = 'set'
+            upload_to_azure(container_name=container_name, file_name=azure_file_name, content=response.content)
+
+        elif response.status_code == 422:
+            print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
+        else:
+            raise ValueError(f'Failed to download; response code is{response.status_code}')
+        # print(f'execution date ={context['ds']}')
+        return 1
     
-    token = extract_psims_all()
+     extract_psims_all()
+     extract_psims_public()
     # order_summary = transform(order_data)
     # load(order_summary["total_order_value"])
 psim_etl_dag = set_psim_etl()
