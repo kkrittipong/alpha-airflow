@@ -55,7 +55,7 @@ def upload_to_azure(container_name, file_name, content):
     blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
 
     print("\nUploading to Azure Storage as blob:\n\t" + file_name)
-    blob_client.upload_blob(io.BytesIO(response.content), overwrite=True)
+    blob_client.upload_blob(io.BytesIO(content), overwrite=True)
 
 
     
