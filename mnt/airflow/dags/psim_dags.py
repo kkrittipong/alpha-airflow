@@ -85,7 +85,7 @@ def set_psim_etl():
             filename = response.headers['Content-Disposition'].split('=')[1]
             azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{filename}'
             container_name = 'set'
-            upload_to_azure(container_name=container_name, file_nam=azure_file_name, content=response.content)
+            upload_to_azure(container_name=container_name, file_name=azure_file_name, content=response.content)
 
         elif response.status_code == 422:
             print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
