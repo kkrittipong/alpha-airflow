@@ -79,7 +79,7 @@ def set_psim_etl():
         context = get_current_context()
         prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
         token = login_and_get_token()
-        download_set(token, prev_date.strftime('%d/%m/%Y'), file='all', group='PSIMS')
+        response = download_set(token, prev_date.strftime('%d/%m/%Y'), file='all', group='PSIMS')
         
         if response.status_code == 200:
             filename = response.headers['Content-Disposition'].split('=')[1]
