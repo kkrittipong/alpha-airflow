@@ -185,7 +185,7 @@ def set_psim_etl():
         #### EXTRACT_PSIMS_56-1
         Download PSIMS data with 56-1 group and return 
         """
-        extract_psim_loopnum(token=token, group='PSIMS', file='56_1')
+        extract_psim_loopnum(token=token, group='PSIMS', file='form56_1data')
         return 1
 
     @task()
