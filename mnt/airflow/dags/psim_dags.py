@@ -68,7 +68,7 @@ def psim_etl():
             connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
             blob_service_client = BlobServiceClient.from_connection_string(connect_str)
             container_name = 'set'
-            local_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d)}/{filename}'
+            local_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{filename}'
 
             # Create a blob client using the local file name as the name for the blob
             blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
