@@ -46,6 +46,7 @@ def psim_etl():
         Download PSIMS data with all group and return 
         """
         context = get_current_context()
+        print(f'context = {context}')
         prev_date = datetime.strptime(context['prev_ds'], '%Y-%m-%d')
 
         token = login_and_get_token()
@@ -75,7 +76,7 @@ def psim_etl():
             print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
             # blob_client.upload_blob(io.BytesIO(response.content), overwrite=True)
         elif response.status_code == 422:
-            print(f'no data for {date_string}')
+            print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
         # print(f'execution date ={context['ds']}')
