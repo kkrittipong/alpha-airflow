@@ -6,6 +6,7 @@ from airflow.utils.dates import days_ago
 from airflow.operators.python import PythonOperator
 from airflow.operators.python import task, get_current_context
 import io 
+from datetime import datetime
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
 
 # These args will get passed on to each operator
@@ -45,14 +46,15 @@ def psim_etl():
         Download PSIMS data with all group and return 
         """
         context = get_current_context()
-        
+        prev_date = datetime.strptime(context['prev_ds '], '%Y-%m-%d')
+
         token = login_and_get_token()
         headers = {
             'accept': '*/*',
             'Authorization': f'Bearer {token}',
         }
 
-        date_string = '17/11/2020'
+        date_string = prev_date.strftime('%d/%m/%Y')
         params = (
             ('date', date_string),
             ('file', 'all'),
@@ -65,7 +67,7 @@ def psim_etl():
             connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
             blob_service_client = BlobServiceClient.from_connection_string(connect_str)
             container_name = 'set'
-            local_file_name = f'psim/17-11-2020/{filename}'
+            local_file_name = f'psim/{prev_date.strftime('%d-%m-%Y')}/{filename}'
 
             # Create a blob client using the local file name as the name for the blob
             blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
@@ -76,7 +78,7 @@ def psim_etl():
             print(f'no data for {date_string}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
-        print(f'execution date ={context}')
+        # print(f'execution date ={context['ds']}')
         return token
     
     token = extract_psims_all()
