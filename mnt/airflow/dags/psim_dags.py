@@ -94,7 +94,7 @@ def set_psim_etl():
         # print(f'execution date ={context['ds']}')
         return 1
     
-    # token = extract_psims_all()
+    token = extract_psims_all()
     # order_summary = transform(order_data)
     # load(order_summary["total_order_value"])
 psim_etl_dag = set_psim_etl()
