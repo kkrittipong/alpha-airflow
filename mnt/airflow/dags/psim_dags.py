@@ -36,7 +36,7 @@ def psim_etl():
     [here](https://airflow.apache.org/docs/stable/tutorial_taskflow_api.html)
     """
     @task()
-    def extract_psims_all():
+    def extract_psims_all(execution_date={{ ds }}):
         """
         #### EXTRACT_PSIMS_ALL
         Download PSIMS data with all group and return 
@@ -71,7 +71,6 @@ def psim_etl():
             print(f'no data for {date_string}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
-        execution_date = {{ ds }}
         print(f'execution date ={execution_date}')
         return token
     
