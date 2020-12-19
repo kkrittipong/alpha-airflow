@@ -25,7 +25,7 @@ def login_and_get_token():
     
 
     
-@dag(default_args=default_args, schedule_interval='@daily', start_date=days_ago(2))
+@dag(default_args=default_args, schedule_interval='@daily', start_date=days_ago(10))
 def psim_etl():
     """
     ### TaskFlow API Tutorial Documentation
@@ -55,18 +55,22 @@ def psim_etl():
         )
 
         response = requests.get('https://api.setportal.set.or.th/download-service/download', headers=headers, params=params, stream=True)
-        filename = response.headers['Content-Disposition'].split('=')[1]
+        if response.status_code == 200:
+            filename = response.headers['Content-Disposition'].split('=')[1]
+            connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+            blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+            container_name = 'set'
+            local_file_name = f'psim/17-11-2020/{filename}'
 
-        connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-        container_name = 'set'
-        local_file_name = f'psim/17-11-2020/{filename}'
+            # Create a blob client using the local file name as the name for the blob
+            blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
 
-        # Create a blob client using the local file name as the name for the blob
-        blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
-
-        print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
-        blob_client.upload_blob(io.BytesIO(response.content))
+            print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
+            blob_client.upload_blob(io.BytesIO(response.content), overwrite=True)
+        elif response.status_code == 422:
+            print(f'no data for {date_string}')
+        else:
+            raise ValueError(f'Failed to download; response code is{response.status_code}')
         return token
     
     token = extract_psims_all()
