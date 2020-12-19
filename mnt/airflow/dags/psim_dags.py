@@ -196,11 +196,19 @@ def set_psim_etl():
         """
         extract_psim_loopnum(token=token, group='PSIMS', file='annualdata')
         return 1
+
+    @task()
+    def transform_financials(token):
+        """
+        #### TRANSFORM FINANCIALS
+        """
+        # extract_psim_loopnum(token=token, group='PSIMS', file='annualdata')
+        return 1
     
     
 
     token = login_setportal()
-    extract_psims_all(token)
+    transform_financial(extract_psims_all(token))
     extract_psims_public(token)
     extract_psims_company(token)
     extract_psims_trading(token)
