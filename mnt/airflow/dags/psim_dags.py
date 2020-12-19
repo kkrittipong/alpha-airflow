@@ -106,15 +106,77 @@ def set_psim_etl():
     @task()
     def extract_psims_public(token):
         """
-        #### EXTRACT_PSIMS_ALL
+        #### EXTRACT_PSIMS_PUBLIC
         Download PSIMS data with public group and return 
         """
         extract_psim(token=token, group='PSIMS', file='public')
         return 1
-        
+
+    @task()
+    def extract_psims_company(token):
+        """
+        #### EXTRACT_PSIMS_COMPANY
+        Download PSIMS data with company group and return 
+        """
+        extract_psim(token=token, group='PSIMS', file='comnapy')
+        return 1
+
+    @task()
+    def extract_psims_trading(token):
+        """
+        #### EXTRACT_PSIMS_TRADING
+        Download PSIMS data with trading group and return 
+        """
+        extract_psim(token=token, group='PSIMS', file='trading')
+        return 1
+
+    @task()
+    def extract_psims_newsen(token):
+        """
+        #### EXTRACT_PSIMS_NEWSEN
+        Download PSIMS data with newsen group and return 
+        """
+        extract_psim(token=token, group='PSIMS', file='newseng')
+        return 1
+
+    @task()
+    def extract_psims_newsth(token):
+        """
+        #### EXTRACT_PSIMS_NEWSTH
+        Download PSIMS data with newsth group and return 
+        """
+        extract_psim(token=token, group='PSIMS', file='newsthai')
+        return 1
+
+    @task()
+    def extract_psims_56_1(token):
+        """
+        #### EXTRACT_PSIMS_56-1
+        Download PSIMS data with 56-1 group and return 
+        """
+        # extract_psim(token=token, group='PSIMS', file='56_1')
+        return 1
+
+    @task()
+    def extract_psims_annual(token):
+        """
+        #### EXTRACT_PSIMS_ANNUAL
+        Download PSIMS data with annual group and return 
+        """
+        # extract_psim(token=token, group='PSIMS', file='annualdata')
+        return 1
+    
+    
+
     token = login_setportal()
     extract_psims_all(token)
     extract_psims_public(token)
+    extract_psims_company(token)
+    extract_psims_trading(token)
+    extract_psims_newsen(token)
+    extract_psims_newsth(token)
+    extract_psims_56_1(token)
+    extract_psims_annual(token)
     # order_summary = transform(order_data)
     # load(order_summary["total_order_value"])
 psim_etl_dag = set_psim_etl()
