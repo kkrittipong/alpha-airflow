@@ -198,7 +198,7 @@ def set_psim_etl():
         return 1
 
     @task()
-    def transform_financials(token):
+    def transform_financials(status):
         """
         #### TRANSFORM FINANCIALS
         """
@@ -208,7 +208,7 @@ def set_psim_etl():
     
 
     token = login_setportal()
-    transform_financial(extract_psims_all(token))
+    status_extract_all = extract_psims_all(token)
     extract_psims_public(token)
     extract_psims_company(token)
     extract_psims_trading(token)
@@ -216,6 +216,8 @@ def set_psim_etl():
     extract_psims_newsth(token)
     extract_psims_56_1(token)
     extract_psims_annual(token)
+
+    transform_financials(status_extract_all)
     # order_summary = transform(order_data)
     # load(order_summary["total_order_value"])
 psim_etl_dag = set_psim_etl()
