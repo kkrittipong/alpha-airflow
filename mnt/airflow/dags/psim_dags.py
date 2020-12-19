@@ -47,7 +47,7 @@ def psim_etl():
         """
         context = get_current_context()
         print(f'context = {context}')
-        prev_date = datetime.strptime(context['prev_ds'], '%Y-%m-%d')
+        prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
 
         token = login_and_get_token()
         headers = {
