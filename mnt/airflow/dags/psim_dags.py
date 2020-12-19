@@ -1,7 +1,11 @@
 import json
 import requests 
+import os
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
+import io 
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
+
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 default_args = {
@@ -43,8 +47,9 @@ def psim_etl():
             'Authorization': f'Bearer {token}',
         }
 
+        date_string = '17/11/2020'
         params = (
-            ('date', '17/11/2020'),
+            ('date', date_string),
             ('file', 'all'),
             ('group', 'PSIMS'),
         )
@@ -52,6 +57,17 @@ def psim_etl():
         response = requests.get('https://api.setportal.set.or.th/download-service/download', headers=headers, params=params, stream=True)
         filename = response.headers['Content-Disposition'].split('=')[1]
         print(f'filename is {filename}')
+
+        connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        container_name = 'set'
+        local_file_name = f'17-11-2020/{filename}'
+
+        # Create a blob client using the local file name as the name for the blob
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
+
+        print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
+        blob_client.upload_blob(io.BytesIO(response.content))
         return token
     
     token = extract_psims_all()
