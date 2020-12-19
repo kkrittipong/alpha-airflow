@@ -14,6 +14,7 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, _
 default_args = {
     'owner': 'airflow',
 }
+
 def login_and_get_token():
     SETPORTAL_LOGIN_URL = 'https://api.setportal.set.or.th/download-service/login'
     headers = {'Content-type': 'application/json', 'accept': '*/*',}
@@ -25,7 +26,37 @@ def login_and_get_token():
     tokens = response.json()
     token = tokens['token']
     return token
-    
+
+def download_set(token, date, file, group):
+    """
+    ref by setportal documents
+    date: %d/%m/%Y
+    file: ex. all
+    group: ex PSIMS
+    """
+
+    headers = {
+        'accept': '*/*',
+        'Authorization': f'Bearer {token}',
+    }
+    params = (
+        ('date', date),
+        ('file', file),
+        ('group', group),
+    )
+    response = requests.get('https://api.setportal.set.or.th/download-service/download', headers=headers, params=params, stream=True)
+    return response
+
+def upload_to_azure(container_name, file_name, content):
+    connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+
+    # Create a blob client using the local file name as the name for the blob
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
+
+    print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
+    blob_client.upload_blob(io.BytesIO(response.content), overwrite=True)
+
 
     
 @dag(default_args=default_args, schedule_interval='@daily', start_date=days_ago(10))
@@ -46,43 +77,24 @@ def psim_etl():
         Download PSIMS data with all group and return 
         """
         context = get_current_context()
-        print(f'context = {context}')
         prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
-
         token = login_and_get_token()
-        headers = {
-            'accept': '*/*',
-            'Authorization': f'Bearer {token}',
-        }
-
-        date_string = prev_date.strftime('%d/%m/%Y')
-        params = (
-            ('date', date_string),
-            ('file', 'all'),
-            ('group', 'PSIMS'),
-        )
-
-        response = requests.get('https://api.setportal.set.or.th/download-service/download', headers=headers, params=params, stream=True)
+        download_set(token, prev_date.strftime('%d/%m/%Y'), file='all', group='PSIMS')
+        
         if response.status_code == 200:
             filename = response.headers['Content-Disposition'].split('=')[1]
-            connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-            blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+            azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{filename}'
             container_name = 'set'
-            local_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{filename}'
+            upload_to_azure(container_name=container_name, file_nam=azure_file_name, content=response.content)
 
-            # Create a blob client using the local file name as the name for the blob
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
-
-            print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
-            blob_client.upload_blob(io.BytesIO(response.content), overwrite=True)
         elif response.status_code == 422:
             print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
         # print(f'execution date ={context['ds']}')
-        return token
+        return 1
     
-    token = extract_psims_all()
+    # token = extract_psims_all()
     # order_summary = transform(order_data)
     # load(order_summary["total_order_value"])
 psim_etl_dag = psim_etl()
