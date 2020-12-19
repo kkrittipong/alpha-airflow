@@ -59,8 +59,8 @@ def upload_to_azure(container_name, file_name, content):
 
 
     
-@dag(default_args=default_args, schedule_interval='@daily', start_date=days_ago(10))
-def psim_etl():
+@dag(default_args=default_args, schedule_interval='@daily', start_date=days_ago(5))
+def set_psim_etl():
     """
     ### TaskFlow API Tutorial Documentation
     This is a simple ETL data pipeline example which demonstrates the use of
