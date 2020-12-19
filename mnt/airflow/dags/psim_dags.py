@@ -71,6 +71,8 @@ def psim_etl():
             print(f'no data for {date_string}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
+        execution_date = {{ ds }}
+        print(f'execution date ={execution_date}')
         return token
     
     token = extract_psims_all()
