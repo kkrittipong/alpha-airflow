@@ -67,6 +67,7 @@ def psim_etl():
         blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
 
         print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
+        print(io.BytesIO(response.content))
         blob_client.upload_blob(io.BytesIO(response.content))
         return token
     
