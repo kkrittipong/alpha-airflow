@@ -74,7 +74,7 @@ def psim_etl():
             blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
 
             print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
-            # blob_client.upload_blob(io.BytesIO(response.content), overwrite=True)
+            blob_client.upload_blob(io.BytesIO(response.content), overwrite=True)
         elif response.status_code == 422:
             print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
         else:
