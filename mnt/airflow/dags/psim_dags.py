@@ -74,14 +74,18 @@ def set_psim_etl():
     """
     
     @task()
-    def extract_psims_all():
+    def login_setportal():
+        token = login_and_get_token()
+        return token
+        
+    @task()
+    def extract_psims_all(token):
         """
         #### EXTRACT_PSIMS_ALL
         Download PSIMS data with all group and return 
         """
         context = get_current_context()
         prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
-        token = login_and_get_token()
         response = download_set(token, prev_date.strftime('%d/%m/%Y'), file='all', group='PSIMS')
         
         if response.status_code == 200:
@@ -98,14 +102,13 @@ def set_psim_etl():
         return 1
 
     @task()
-    def extract_psims_public():
+    def extract_psims_public(token):
         """
         #### EXTRACT_PSIMS_ALL
         Download PSIMS data with all group and return 
         """
         context = get_current_context()
         prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
-        token = login_and_get_token()
         response = download_set(token, prev_date.strftime('%d/%m/%Y'), file='public', group='PSIMS')
         
         if response.status_code == 200:
@@ -118,11 +121,12 @@ def set_psim_etl():
             print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
-        # print(f'execution date ={context['ds']}')
+
         return 1
-    
-    extract_psims_all()
-    extract_psims_public()
+
+    token = login_setportal()
+    extract_psims_all(token)
+    extract_psims_public(token)
     # order_summary = transform(order_data)
     # load(order_summary["total_order_value"])
 psim_etl_dag = set_psim_etl()
