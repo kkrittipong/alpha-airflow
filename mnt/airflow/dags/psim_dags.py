@@ -46,7 +46,7 @@ def psim_etl():
         Download PSIMS data with all group and return 
         """
         context = get_current_context()
-        prev_date = datetime.strptime(context['prev_ds '], '%Y-%m-%d')
+        prev_date = datetime.strptime(context['prev_ds'], '%Y-%m-%d')
 
         token = login_and_get_token()
         headers = {
