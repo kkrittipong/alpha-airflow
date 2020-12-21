@@ -1,0 +1,22 @@
+version: 2.1
+
+# Define the jobs we want to run for this project
+jobs:
+  build:
+  machine: ubuntu-1604:202007-01
+    steps:
+      - checkout
+      - run: |
+         docker login -u alphacontainerregistry -p z0tCIRZndpdsBGF=8D7K/D5mV8fldIBX alphacontainerregistry.azurecr.io
+      # build the application image
+      - run: docker build -t alpha/dataplatform:$CIRCLE_BRANCH .
+
+      # deploy the image
+      - run: docker push alpha/dataplatform:$CIRCLE_BRANCH
+
+# Orchestrate our job run sequence
+workflows:
+  build_and_push:
+    jobs:
+      - build
+

@@ -109,7 +109,7 @@ def extract_psim_loopnum(token, group, file):
 
 
     
-@dag(default_args=default_args, schedule_interval='@daily', start_date=days_ago(5))
+@dag(default_args=default_args, schedule_interval='00 23 * * *', start_date=days_ago(5))
 def set_psim_etl():
     """
     ### TaskFlow API Tutorial Documentation
