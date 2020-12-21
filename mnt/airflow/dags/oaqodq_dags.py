@@ -15,6 +15,17 @@ default_args = {
     'owner': 'airflow',
 }
 
+def message_discord(message):
+    url = 'https://discord.com/api/webhooks/790652292050452500/o22AuDsdYLkbagb-311saSQ71kaQvdYIsh-Z9nlRyeuCPdv7i8ByHMy1y1rHyiqaXAPb'
+    headers = {'Content-type': 'application/json'}
+    data = {
+        'username': 'john',
+        'avatar_url': '',
+        'content': message
+    }
+    r = requests.post(url, data=json.dumps(data), headers=headers)
+    return 1
+
 def login_and_get_token():
     SETPORTAL_LOGIN_URL = 'https://api.setportal.set.or.th/download-service/login'
     headers = {'Content-type': 'application/json', 'accept': '*/*',}
@@ -68,6 +79,7 @@ def upload_to_azure(container_name, file_name, content):
     blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
 
     print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+    message_discord("Uploading to Azure Storage as blob:" + file_name)
     blob_client.upload_blob(io.BytesIO(content), overwrite=True)
 
 def extract_psim(token, group, file):
