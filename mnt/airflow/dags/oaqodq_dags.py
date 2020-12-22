@@ -96,7 +96,7 @@ def extract_psim(token, group, file):
     elif response.status_code == 422:
         print(f'no data for {current_date.strftime("%d-%m-%Y")}')
     else:
-        print(f'{azure_file_name}, Failed to download; response code is{response.status_code}')
+        print(f'{file}, Failed to download; response code is{response.status_code}')
 
 def extract_psim_loopnum(token, group, file):
     context = get_current_context()
