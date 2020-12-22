@@ -84,35 +84,35 @@ def upload_to_azure(container_name, file_name, content):
 
 def extract_psim(token, group, file):
     context = get_current_context()
-    prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
-    response = download_set(token, prev_date.strftime('%d/%m/%Y'), file=file, group=group)
+    current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+    response = download_set(token, current_date.strftime('%d/%m/%Y'), file=file, group=group)
     
     if response.status_code == 200:
         filename = response.headers['Content-Disposition'].split('=')[1]
-        azure_file_name = f'oaq_odq/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{file}/{filename}'
+        azure_file_name = f'oaq_odq/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/{file}/{filename}'
         container_name = 'set'
         upload_to_azure(container_name=container_name, file_name=azure_file_name, content=response.content)
 
     elif response.status_code == 422:
-        print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
+        print(f'no data for {current_date.strftime("%d-%m-%Y")}')
     else:
         raise ValueError(f'Failed to download; response code is{response.status_code}')
 
 def extract_psim_loopnum(token, group, file):
     context = get_current_context()
-    prev_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
+    current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
     file_count = 1
     while True:
-        response = download_set(token, prev_date.strftime('%d/%m/%Y'), file=file, group=group, no=f'{file_count:02}')
+        response = download_set(token, current_date.strftime('%d/%m/%Y'), file=file, group=group, no=f'{file_count:02}')
         if response.status_code == 200:
             filename = response.headers['Content-Disposition'].split('=')[1]
-            azure_file_name = f'psim/{prev_date.strftime("%Y")}/{prev_date.strftime("%m")}/{prev_date.strftime("%d")}/{file}/{filename}'
+            azure_file_name = f'psim/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/{file}/{filename}'
             container_name = 'set'
             upload_to_azure(container_name=container_name, file_name=azure_file_name, content=response.content)
             file_count = file_count + 1
 
         elif response.status_code == 422:
-            print(f'no data for {prev_date.strftime("%d-%m-%Y")}')
+            print(f'no data for {current_date.strftime("%d-%m-%Y")}')
             break
         else:
             raise ValueError(f'Failed to download; response code is{response.status_code}')
