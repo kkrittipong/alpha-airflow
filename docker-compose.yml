@@ -21,6 +21,7 @@ services:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
             - AIRFLOW__CORE__DAGS_FOLDER=/usr/local/airflow/dags
             - AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=alphadatalake;AccountKey=T00js9CpaKfrSJVXmlBbYGufbuxOS6/U3M9OlBXSA6hkmfj/UEWLe3Ch/oP0fxA3yAyNegBuOioSgT4CWmuSRw==;EndpointSuffix=core.windows.net
+            - AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL=10
         logging:
             options:
                 max-size: 10m
