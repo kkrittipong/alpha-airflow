@@ -7,4 +7,4 @@ RUN ["chmod", "+x", "/entrypoint.sh"]
 USER airflow
 
 RUN pip install azure-storage-blob 
-ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]
