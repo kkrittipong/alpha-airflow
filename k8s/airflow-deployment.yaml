@@ -8,7 +8,7 @@ spec:
     matchLabels:
       component: airflow
   template:
-    metadata:
+    metadata: 
       labels:
         component: airflow
     spec:
