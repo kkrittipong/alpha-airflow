@@ -39,12 +39,12 @@ def download_exchanges(token):
     exchanges_df = pd.read_json(f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=json')
     return exchanges_df
 
-def download_eod_prices(token, market_code):
+def download_eod_prices(token, market_code, date):
     """
     https://eodhistoricaldata.com/api/eod-bulk-last-day/{MARKET_CODE}?api_token={YOUR_API_KEY}
     """
 
-    eod_prices_df = pd.read_json(f'https://eodhistoricaldata.com/api/eod-bulk-last-day/{market_code}?api_token={token}')
+    eod_prices_df = pd.read_csv(f'https://eodhistoricaldata.com/api/eod-bulk-last-day/{market_code}?api_token={token}&date={date}')
     return eod_prices_df
 
 
@@ -106,12 +106,24 @@ def unicorn_etl():
     
     @task()
     def load_eod_prices():
+        context = get_current_context()
+        current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
         # for market_code in MARKET_CODES:
         market_code = 'US'
-        eod_prices_df = download_eod_prices(TOKEN, market_code)
-        today = date.today()
-        azure_file_name = f'eod/{today.strftime("%Y")}/{today.strftime("%m")}/{today.strftime("%d")}/prices/{market_code}.csv'
+        eod_prices_df = download_eod_prices(TOKEN, market_code, current_date)
+        azure_file_name = f'eod/{context['ds'].strftime("%Y")}/{context['ds'].strftime("%m")}/{context['ds'].strftime("%d")}/prices/{market_code}.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name ,eod_prices_df)
+        return azure_file_name
+    
+    @task()
+    def load_eod_dividend():
+        context = get_current_context()
+        current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+        # for market_code in MARKET_CODES:
+        market_code = 'US'
+        df = download_eod_prices(TOKEN, market_code, current_date)
+        azure_file_name = f'eod/{context['ds'].strftime("%Y")}/{context['ds'].strftime("%m")}/{context['ds'].strftime("%d")}/dividends/data.csv'
+        upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
         return azure_file_name
 
 
