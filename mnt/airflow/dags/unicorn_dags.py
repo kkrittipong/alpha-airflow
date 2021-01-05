@@ -34,7 +34,7 @@ def download_exchanges(token):
     https://eodhistoricaldata.com/api/exchanges-list/?api_token=YOUR_API_TOKEN&fmt=json
     """
 
-    exchanges_df = pd.read_csv(f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=csv')
+    exchanges_df = pd.read_json(f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=json')
     return exchanges_df
 
 
