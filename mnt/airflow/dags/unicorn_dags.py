@@ -111,7 +111,7 @@ def unicorn_etl():
         # for market_code in MARKET_CODES:
         market_code = 'US'
         eod_prices_df = download_eod_prices(TOKEN, market_code, current_date)
-        azure_file_name = f'eod/{context['ds'].strftime("%Y")}/{context['ds'].strftime("%m")}/{context['ds'].strftime("%d")}/prices/{market_code}.csv'
+        azure_file_name = f'eod/{context["ds"].strftime("%Y")}/{context["ds"].strftime("%m")}/{context["ds"].strftime("%d")}/prices/{market_code}.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name ,eod_prices_df)
         return azure_file_name
     
@@ -122,7 +122,7 @@ def unicorn_etl():
         # for market_code in MARKET_CODES:
         market_code = 'US'
         df = download_eod_prices(TOKEN, market_code, current_date)
-        azure_file_name = f'eod/{context['ds'].strftime("%Y")}/{context['ds'].strftime("%m")}/{context['ds'].strftime("%d")}/dividends/data.csv'
+        azure_file_name = f'eod/{context["ds"].strftime("%Y")}/{context["ds"].strftime("%m")}/{context["ds"].strftime("%d")}/dividends/data.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
         return azure_file_name
 
