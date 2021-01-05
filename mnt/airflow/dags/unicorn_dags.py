@@ -34,7 +34,7 @@ def download_exchanges(token):
     https://eodhistoricaldata.com/api/exchanges-list/?api_token=YOUR_API_TOKEN&fmt=json
     """
 
-    exchanges_df = d.read_csv(f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=csv')
+    exchanges_df = pd.read_csv(f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=csv')
     return exchanges_df
 
 
@@ -55,7 +55,7 @@ def upload_pandas_to_azure(container_name, file_name, df):
     blob_client.upload_blob(upload_data, overwrite=True)
 
 
-@dag(default_args=default_args, schedule_interval='00 23 * * *', start_date=days_ago(31))
+@dag(default_args=default_args, schedule_interval='00 23 * * *', start_date=days_ago(3))
 def unicorn_etl():
     """
     ### TaskFlow API Tutorial Documentation
