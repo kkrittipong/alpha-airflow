@@ -67,6 +67,15 @@ def download_eod_splits(token, market_code, date):
     eod_prices_df = pd.read_csv(url)
     return eod_prices_df
 
+def download_entire_prices(token, ticker, matket_code):
+    """
+    https://eodhistoricaldata.com/api/eod/MCD.US?api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX&period=d
+    """
+    url = f'https://eodhistoricaldata.com/api/eod/{ticker}.{matket_code}?api_token={token}'
+    print(f'loading {url}')
+    df = pd.read_csv(url)
+    return df
+
 
 def upload_pandas_to_azure(container_name, file_name, df):
     """
@@ -81,7 +90,6 @@ def upload_pandas_to_azure(container_name, file_name, df):
     print("\nUploading to Azure Storage as blob:\n\t" + file_name)
     message_discord("Uploading to Azure Storage as blob:" + file_name)
     blob_client.upload_blob(upload_data, overwrite=True)
-
 
 @dag(default_args=default_args, schedule_interval='00 23 * * *', start_date=days_ago(3))
 def unicorn_etl():
@@ -156,11 +164,22 @@ def unicorn_etl():
         azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/splits/data.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
         return azure_file_name
+    
+    @task()
+    def load_entire_prices(ticker, matket_code):
+        context = get_current_context()
+        current_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
+        df = download_entire_prices(TOKEN, ticker, matket_code)
+        azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/historical_prices/{ticker}.csv'
+        upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
+        return azure_file_name
+        
 
 
     upload_exchanges_to_database(load_exchanges())
     load_eod_prices()
     load_eod_dividend()
     load_eod_splits()
+    load_entire_prices(ticker='AAPL', matket_code='US')
 
 unicorn_etl_dag = unicorn_etl()
