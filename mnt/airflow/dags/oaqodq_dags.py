@@ -84,7 +84,7 @@ def upload_to_azure(container_name, file_name, content):
 
 def extract_psim(token, group, file):
     context = get_current_context()
-    current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+    current_date = datetime.strptime(context['next_ds'], '%Y-%m-%d')
     response = download_set(token, current_date.strftime('%d/%m/%Y'), file=file, group=group)
     
     if response.status_code == 200:
@@ -100,7 +100,7 @@ def extract_psim(token, group, file):
 
 def extract_psim_loopnum(token, group, file):
     context = get_current_context()
-    current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+    current_date = datetime.strptime(context['next_ds'], '%Y-%m-%d')
     file_count = 1
     while True:
         response = download_set(token, current_date.strftime('%d/%m/%Y'), file=file, group=group, no=f'{file_count:02}')
