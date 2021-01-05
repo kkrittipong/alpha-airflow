@@ -35,16 +35,18 @@ def download_exchanges(token):
     """
     https://eodhistoricaldata.com/api/exchanges-list/?api_token=YOUR_API_TOKEN&fmt=json
     """
-
-    exchanges_df = pd.read_json(f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=json')
+    url = f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=json'
+    print(f'loading {url}')
+    exchanges_df = pd.read_json(url)
     return exchanges_df
 
 def download_eod_prices(token, market_code, date):
     """
     https://eodhistoricaldata.com/api/eod-bulk-last-day/{MARKET_CODE}?api_token={YOUR_API_KEY}
     """
-
-    eod_prices_df = pd.read_csv(f'https://eodhistoricaldata.com/api/eod-bulk-last-day/{market_code}?api_token={token}&date={date}')
+    url = f'https://eodhistoricaldata.com/api/eod-bulk-last-day/{market_code}?api_token={token}&date={date}'
+    print(f'loading {url}')
+    eod_prices_df = pd.read_csv(url)
     return eod_prices_df
 
 
