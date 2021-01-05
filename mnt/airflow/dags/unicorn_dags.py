@@ -10,6 +10,8 @@ from datetime import datetime
 from datetime import date
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
 import pandas as pd
+import psycopg2
+
 
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
@@ -38,8 +40,6 @@ def download_exchanges(token):
     return exchanges_df
 
 
-
-
 def upload_pandas_to_azure(container_name, file_name, df):
     """
     """
@@ -66,18 +66,36 @@ def unicorn_etl():
     [here](https://airflow.apache.org/docs/stable/tutorial_taskflow_api.html)
     """
     TOKEN = '5d66a65679a7c9.784184268264'
+    CONN_STR = 'postgres://postgres:M3mF4cvbwG@203.154.234.138:30888/unicorn'
+    CONTAINER_NAME = 'unicorn'
+
     
     @task()
     def load_exchanges():
         exchanges_df = download_exchanges(TOKEN)
         today = date.today()
         azure_file_name = f'eod/{today.strftime("%Y")}/{today.strftime("%m")}/{today.strftime("%d")}/exchanges/data.csv'
-        container_name = 'unicorn'
-        upload_pandas_to_azure(container_name, azure_file_name ,exchanges_df)
+        upload_pandas_to_azure(CONTAINER_NAME, azure_file_name ,exchanges_df)
+        return azure_file_name
+    
+    @task()
+    def upload_exchanges_to_database(azure_file_name):
+        connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=azure_file_name)
+        df = pd.read_csv(io.StringIO(blob_client.download_blob().content_as_text()))
+        connection = psycopg2.connect(CONN_STR)
+        cursor = connection.cursor()
+        print(df)
+        print("PostgreSQL server information")
+        print(connection.get_dsn_parameters(), "\n")
+        # Executing a SQL query
+        cursor.execute("SELECT version();")
+        # Fetch result
+        record = cursor.fetchone()
+        print("You are connected to - ", record, "\n")
         return 1
-    
-    
 
-    load_exchanges()
+    upload_exchanges_to_database(load_exchanges())
 
 unicorn_etl_dag = unicorn_etl()
