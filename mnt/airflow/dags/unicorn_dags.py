@@ -76,7 +76,7 @@ def unicorn_etl():
     [here](https://airflow.apache.org/docs/stable/tutorial_taskflow_api.html)
     """
     TOKEN = '5d66a65679a7c9.784184268264'
-    CONN_STR = 'postgres://postgres:M3mF4cvbwG@203.154.234.138:30888/unicorn'
+    CONN_STR = 'postgres://postgres:M3mF4cvbwG@192.168.105.32:30888/unicorn'
     CONTAINER_NAME = 'unicorn'
 
     
