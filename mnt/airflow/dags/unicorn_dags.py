@@ -39,6 +39,14 @@ def download_exchanges(token):
     exchanges_df = pd.read_json(f'https://eodhistoricaldata.com/api/exchanges-list/?api_token={token}&fmt=json')
     return exchanges_df
 
+def download_eod_prices(token, market_code):
+    """
+    https://eodhistoricaldata.com/api/eod-bulk-last-day/{MARKET_CODE}?api_token={YOUR_API_KEY}
+    """
+
+    eod_prices_df = pd.read_json(f'https://eodhistoricaldata.com/api/eod-bulk-last-day/{market_code}?api_token={token}')
+    return eod_prices_df
+
 
 def upload_pandas_to_azure(container_name, file_name, df):
     """
@@ -95,7 +103,19 @@ def unicorn_etl():
         record = cursor.fetchone()
         print("You are connected to - ", record, "\n")
         return 1
+    
+    @task()
+    def load_eod_prices():
+        # for market_code in MARKET_CODES:
+        market_code = 'US'
+        eod_prices_df = download_eod_prices(TOKEN, market_code)
+        today = date.today()
+        azure_file_name = f'eod/{today.strftime("%Y")}/{today.strftime("%m")}/{today.strftime("%d")}/prices/{market_code}.csv'
+        upload_pandas_to_azure(CONTAINER_NAME, azure_file_name ,eod_prices_df)
+        return azure_file_name
+
 
     upload_exchanges_to_database(load_exchanges())
+    load_eod_prices()
 
 unicorn_etl_dag = unicorn_etl()
