@@ -48,6 +48,24 @@ def download_eod_prices(token, market_code, date):
     print(f'loading {url}')
     eod_prices_df = pd.read_csv(url)
     return eod_prices_df
+    
+def download_eod_dividends(token, market_code, date):
+    """
+    https://eodhistoricaldata.com/api/eod-bulk-last-day/{MARKET_CODE}?api_token={YOUR_API_KEY}&type=dividends
+    """
+    url = f'https://eodhistoricaldata.com/api/eod-bulk-last-day/{market_code}?api_token={token}&date={date}&type=dividends'
+    print(f'loading {url}')
+    eod_prices_df = pd.read_csv(url)
+    return eod_prices_df
+
+def download_eod_splits(token, market_code, date):
+    """
+    https://eodhistoricaldata.com/api/eod-bulk-last-day/{MARKET_CODE}?api_token={YOUR_API_KEY}&type=splits
+    """
+    url = f'https://eodhistoricaldata.com/api/eod-bulk-last-day/{market_code}?api_token={token}&date={date}&type=splits'
+    print(f'loading {url}')
+    eod_prices_df = pd.read_csv(url)
+    return eod_prices_df
 
 
 def upload_pandas_to_azure(container_name, file_name, df):
@@ -123,13 +141,26 @@ def unicorn_etl():
         current_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
         # for market_code in MARKET_CODES:
         market_code = 'US'
-        df = download_eod_prices(TOKEN, market_code, context['yesterday_ds'])
+        df = download_eod_dividends(TOKEN, market_code, context['yesterday_ds'])
         azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/dividends/data.csv'
+        upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
+        return azure_file_name
+
+    @task()
+    def load_eod_splits():
+        context = get_current_context()
+        current_date = datetime.strptime(context['yesterday_ds'], '%Y-%m-%d')
+        # for market_code in MARKET_CODES:
+        market_code = 'US'
+        df = download_eod_splits(TOKEN, market_code, context['yesterday_ds'])
+        azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/splits/data.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
         return azure_file_name
 
 
     upload_exchanges_to_database(load_exchanges())
     load_eod_prices()
+    load_eod_dividend()
+    load_eod_splits()
 
 unicorn_etl_dag = unicorn_etl()
