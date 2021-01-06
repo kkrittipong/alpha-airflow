@@ -121,7 +121,7 @@ def extract_psim_loopnum(token, group, file):
 
 
     
-@dag(default_args=default_args, schedule_interval='00 23 * * *', start_date=days_ago(31))
+@dag(default_args=default_args, schedule_interval='00 23 * * *', start_date=datetime(2021, 1, 1))
 def set_oaqodq_etl():
     """
     ### TaskFlow API Tutorial Documentation
