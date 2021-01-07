@@ -91,7 +91,7 @@ def upload_pandas_to_azure(container_name, file_name, df):
     message_discord("Uploading to Azure Storage as blob:" + file_name)
     blob_client.upload_blob(upload_data, overwrite=True)
 
-@dag(default_args=default_args, schedule_interval='00 23 * * *', start_date=days_ago(3))
+@dag(default_args=default_args, schedule_interval='20 23 * * *', start_date=days_ago(3))
 def unicorn_etl():
     """
     ### TaskFlow API Tutorial Documentation
