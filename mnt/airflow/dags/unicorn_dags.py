@@ -135,10 +135,10 @@ def unicorn_etl():
     @task()
     def load_eod_prices():
         context = get_current_context()
-        current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+        current_date = datetime.strptime(context['tomorrow_ds'], '%Y-%m-%d')
         # for market_code in MARKET_CODES:
         market_code = 'US'
-        eod_prices_df = download_eod_prices(TOKEN, market_code, context['ds'])
+        eod_prices_df = download_eod_prices(TOKEN, market_code, context['tomorrow_ds'])
         azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/prices/{market_code}.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name ,eod_prices_df)
         return azure_file_name
@@ -146,10 +146,10 @@ def unicorn_etl():
     @task()
     def load_eod_dividend():
         context = get_current_context()
-        current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+        current_date = datetime.strptime(context['tomorrow_ds'], '%Y-%m-%d')
         # for market_code in MARKET_CODES:
         market_code = 'US'
-        df = download_eod_dividends(TOKEN, market_code, context['ds'])
+        df = download_eod_dividends(TOKEN, market_code, context['tomorrow_ds'])
         azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/dividends/data.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
         return azure_file_name
@@ -157,10 +157,10 @@ def unicorn_etl():
     @task()
     def load_eod_splits():
         context = get_current_context()
-        current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+        current_date = datetime.strptime(context['tomorrow_ds'], '%Y-%m-%d')
         # for market_code in MARKET_CODES:
         market_code = 'US'
-        df = download_eod_splits(TOKEN, market_code, context['ds'])
+        df = download_eod_splits(TOKEN, market_code, context['tomorrow_ds'])
         azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/splits/data.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
         return azure_file_name
@@ -168,7 +168,7 @@ def unicorn_etl():
     @task()
     def load_entire_prices(ticker, matket_code):
         context = get_current_context()
-        current_date = datetime.strptime(context['ds'], '%Y-%m-%d')
+        current_date = datetime.strptime(context['tomorrow_ds'], '%Y-%m-%d')
         df = download_entire_prices(TOKEN, ticker, matket_code)
         azure_file_name = f'eod/{current_date.strftime("%Y")}/{current_date.strftime("%m")}/{current_date.strftime("%d")}/historical_prices/{ticker}.csv'
         upload_pandas_to_azure(CONTAINER_NAME, azure_file_name, df)
