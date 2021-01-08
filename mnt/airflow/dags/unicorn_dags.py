@@ -20,10 +20,10 @@ default_args = {
 }
 
 def message_discord(message):
-    url = 'https://discord.com/api/webhooks/790652292050452500/o22AuDsdYLkbagb-311saSQ71kaQvdYIsh-Z9nlRyeuCPdv7i8ByHMy1y1rHyiqaXAPb'
+    url = 'https://discord.com/api/webhooks/796951141627068426/D4lhHfKJ1rMQ5YlMQSzSDX8uhrMUoN93RkVcOeM0JhIYx2J4M9FLfvBPbP0kW81yBoh4'
     headers = {'Content-type': 'application/json'}
     data = {
-        'username': 'john',
+        'username': 'Airflow Hook',
         'avatar_url': '',
         'content': message
     }
